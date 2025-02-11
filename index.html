@@ -13,8 +13,8 @@
             padding: 20px;
         }
         .container {
-            max-width: 600px;
-            background: rgba(0, 0, 0, 0.8);
+            max-width: 700px;
+            background: rgba(0, 0, 0, 0.85);
             padding: 20px;
             border-radius: 10px;
             margin: auto;
@@ -34,7 +34,7 @@
         button:hover {
             background: #e64a19;
         }
-        .result, .exercise, .nutrition {
+        .result, .exercise, .nutrition, .weights {
             text-align: left;
             padding: 10px;
             margin-top: 20px;
@@ -67,6 +67,7 @@
 
     <div id="result" class="result"></div>
     <div id="exercise" class="exercise"></div>
+    <div id="weights" class="weights"></div>
     <div id="nutrition" class="nutrition"></div>
 </div>
 
@@ -85,7 +86,7 @@ function calculate() {
     // คำนวณ BMI
     const bmi = weight / ((height / 100) ** 2);
 
-    // คำนวณค่าเผาผลาญพื้นฐาน (BMR)
+    // คำนวณ BMR
     const bmr = 10 * weight + 6.25 * height - 5 * age + 5;
     let tdee = bmr * 1.2; 
 
@@ -102,31 +103,40 @@ function calculate() {
         <p><strong>แคลอรี่ที่แนะนำต่อวัน (TDEE):</strong> ${tdee.toFixed(2)} แคลอรี่</p>
     `;
 
-    // แผนการออกกำลังกายแบบละเอียดมาก (ตามน้ำหนักและส่วนสูงจริง)
+    // คำนวณน้ำหนักที่ใช้สำหรับเวทเทรนนิ่ง
+    const deadliftWeight = (weight * 1.5).toFixed(1);
+    const squatWeight = (weight * 1.2).toFixed(1);
+    const benchPressWeight = (weight * 0.8).toFixed(1);
+    const shoulderPressWeight = (weight * 0.5).toFixed(1);
+
+    let weightPlan = `<h3>น้ำหนักที่แนะนำสำหรับเวทเทรนนิ่ง</h3>
+        <ul>
+            <li>Deadlift: ${deadliftWeight} กก.</li>
+            <li>Squat: ${squatWeight} กก.</li>
+            <li>Bench Press: ${benchPressWeight} กก.</li>
+            <li>Shoulder Press: ${shoulderPressWeight} กก.</li>
+        </ul>`;
+    document.getElementById("weights").innerHTML = weightPlan;
+
+    // แผนการออกกำลังกาย
     let exercisePlan = "<h3>แผนการออกกำลังกาย</h3><ul>";
     const runningMinutes = Math.round(weight / 2 + height / 100);
     const cyclingMinutes = Math.round(weight / 3 + height / 110);
     const pushups = Math.round(weight / 4 + height / 120);
     const squats = Math.round(weight / 3 + height / 115);
+    const plankSeconds = Math.round(weight / 5 + height / 120) * 10;
 
     if (goal === "lose") {
         exercisePlan += `
-            <li>วิ่งบนลู่ ${runningMinutes} นาที ที่ความเร็ว 8-10 กม./ชม.</li>
+            <li>วิ่ง ${runningMinutes} นาที (ความเร็ว 8-10 กม./ชม.)</li>
             <li>ปั่นจักรยาน ${cyclingMinutes} นาที</li>
             <li>วิดพื้น ${pushups} ครั้ง</li>
             <li>Squats ${squats} ครั้ง</li>
-        `;
-    } else if (goal === "maintain") {
-        exercisePlan += `
-            <li>เดินเร็ว ${runningMinutes} นาที</li>
-            <li>โยคะ ${cyclingMinutes} นาที</li>
-            <li>วิดพื้น ${pushups} ครั้ง</li>
+            <li>Plank ${plankSeconds} วินาที</li>
         `;
     } else if (goal === "gain") {
         exercisePlan += `
-            <li>Squats ${squats} ครั้ง</li>
-            <li>Deadlifts ${pushups} ครั้ง</li>
-            <li>Bench Press ${runningMinutes} ครั้ง</li>
+            <li>เล่นเวทเทรนนิ่งตามน้ำหนักที่แนะนำ</li>
         `;
     }
 
@@ -137,17 +147,11 @@ function calculate() {
     let nutritionPlan = "<h3>คำแนะนำด้านโภชนาการ</h3><ul>";
     if (goal === "lose") {
         nutritionPlan += "<li>ลดแป้ง เพิ่มโปรตีน</li><li>กินผักและผลไม้มากขึ้น</li>";
-    } else if (goal === "maintain") {
-        nutritionPlan += "<li>รับประทานอาหารให้ครบ 5 หมู่</li><li>ดื่มน้ำให้เพียงพอ</li>";
     } else if (goal === "gain") {
         nutritionPlan += "<li>เพิ่มโปรตีน เช่น เนื้อสัตว์ ไข่ขาว เวย์โปรตีน</li><li>กินคาร์บเชิงซ้อน</li>";
     }
     nutritionPlan += "</ul>";
     document.getElementById("nutrition").innerHTML = nutritionPlan;
-
-    // บันทึกข้อมูล
-    const userData = { weight, height, age, goal, bmi, bmr, tdee };
-    localStorage.setItem("userData", JSON.stringify(userData));
 }
 </script>
 
