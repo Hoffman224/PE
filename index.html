@@ -3,29 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>คำนวณ BMI และแนะนำท่าออกกำลังกาย</title>
+    <title>คำนวณการออกกำลังกายตามน้ำหนัก</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        .container { width: 50%; margin: auto; padding: 20px; }
-        input { padding: 8px; margin: 5px; }
-        button { padding: 10px; background: blue; color: white; border: none; cursor: pointer; }
-        .result, .exercise { margin-top: 20px; padding: 10px; border-radius: 5px; }
+        body { font-family: Arial, sans-serif; text-align: center; background: #f0f0f0; padding: 20px; }
+        .container { width: 50%; margin: auto; padding: 20px; background: white; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
+        input { padding: 8px; margin: 5px; width: 80px; }
+        button { padding: 10px; background: blue; color: white; border: none; cursor: pointer; margin-top: 10px; }
+        .result, .exercise { margin-top: 20px; padding: 15px; border-radius: 5px; background: #e3f2fd; }
+        ul { text-align: left; display: inline-block; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>คำนวณ BMI และแนะนำการออกกำลังกาย</h2>
+    <h2>คำนวณแผนออกกำลังกาย</h2>
     <label>น้ำหนัก (kg): <input type="number" id="weight"></label><br>
     <label>ส่วนสูง (cm): <input type="number" id="height"></label><br>
-    <button onclick="calculateBMI()">คำนวณ</button>
+    <button onclick="calculateWorkout()">คำนวณ</button>
 
     <div id="bmiResult" class="result"></div>
     <div id="exerciseSuggestion" class="exercise"></div>
 </div>
 
 <script>
-function calculateBMI() {
+function calculateWorkout() {
     let weight = parseFloat(document.getElementById("weight").value);
     let height = parseFloat(document.getElementById("height").value) / 100;
     
@@ -36,24 +37,32 @@ function calculateBMI() {
 
     let bmi = (weight / (height * height)).toFixed(2);
     let resultText = `ค่า BMI ของคุณคือ: <strong>${bmi}</strong>`;
-    
-    let exerciseText = "<h3>แนะนำท่าออกกำลังกาย:</h3><ul>";
+
+    let exercises = [];
+    let reps = 10;
+    let sets = 3;
+
     if (bmi < 18.5) {
         resultText += "<p>คุณอยู่ในเกณฑ์น้ำหนักต่ำกว่าเกณฑ์</p>";
-        exerciseText += "<li>Squats - 3 เซ็ต (12 ครั้ง)</li>";
-        exerciseText += "<li>Deadlifts - 3 เซ็ต (10 ครั้ง)</li>";
-        exerciseText += "<li>Bench Press - 3 เซ็ต (10 ครั้ง)</li>";
+        exercises = ["Squats", "Deadlifts", "Bench Press", "Pull-ups"];
+        reps = 15;
+        sets = 4;
     } else if (bmi >= 18.5 && bmi < 25) {
         resultText += "<p>คุณอยู่ในเกณฑ์ปกติ</p>";
-        exerciseText += "<li>โยคะ - 20 นาที</li>";
-        exerciseText += "<li>วิดพื้น - 3 เซ็ต (15 ครั้ง)</li>";
-        exerciseText += "<li>ปั่นจักรยาน - 30 นาที</li>";
+        exercises = ["Push-ups", "Jump Rope", "Plank", "Running"];
+        reps = 20;
+        sets = 3;
     } else {
         resultText += "<p>คุณอยู่ในเกณฑ์น้ำหนักเกิน</p>";
-        exerciseText += "<li>เดินเร็ว - 30 นาที</li>";
-        exerciseText += "<li>กระโดดเชือก - 15 นาที</li>";
-        exerciseText += "<li>HIIT Cardio - 20 นาที</li>";
+        exercises = ["Brisk Walking", "Cycling", "Swimming", "HIIT Cardio"];
+        reps = 30;
+        sets = 2;
     }
+
+    let exerciseText = "<h3>แนะนำท่าออกกำลังกาย:</h3><ul>";
+    exercises.forEach(exercise => {
+        exerciseText += `<li>${exercise} - ${sets} เซ็ต (${reps} ครั้ง/นาที)</li>`;
+    });
     exerciseText += "</ul>";
 
     document.getElementById("bmiResult").innerHTML = resultText;
