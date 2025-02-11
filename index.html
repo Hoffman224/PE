@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI โปรแกรมออกกำลังกายอัจฉริยะ</title>
+  <title>โปรแกรมคำนวณการออกกำลังกาย AI</title>
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background: url('https://source.unsplash.com/1600x900/?fitness,gym') no-repeat center center fixed;
+      background-image: url('background.jpg'); /* เพิ่มพื้นหลัง */
       background-size: cover;
+      background-position: center;
       margin: 0;
       padding: 0;
       display: flex;
@@ -17,19 +18,22 @@
       height: 100vh;
     }
     .container {
-      width: 90%;
-      max-width: 600px;
+      width: 100%;
+      max-width: 500px;
       background: rgba(255, 255, 255, 0.9);
-      padding: 20px;
+      padding: 30px;
       border-radius: 15px;
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
       text-align: center;
     }
     h1 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
       color: #333;
     }
     label {
-      font-weight: bold;
+      font-size: 1rem;
+      font-weight: 500;
       display: block;
       margin-top: 10px;
     }
@@ -37,151 +41,145 @@
       width: 100%;
       padding: 10px;
       margin-top: 5px;
-      border-radius: 5px;
+      border-radius: 8px;
       border: 1px solid #ccc;
+      font-size: 1rem;
     }
     button {
+      margin-top: 15px;
       width: 100%;
       padding: 12px;
       background: #007bff;
       border: none;
-      color: white;
+      color: #fff;
       font-size: 1rem;
-      font-weight: bold;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
-      margin-top: 15px;
     }
     button:hover {
       background: #0056b3;
     }
     .result, .exercise {
-      margin-top: 15px;
-      padding: 10px;
-      border-radius: 5px;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 1rem;
       text-align: left;
     }
     .result {
-      background: #d4edda;
+      background: #eaf4e6;
       border: 1px solid #c3e6cb;
     }
     .exercise {
-      background: #f8d7da;
-      border: 1px solid #f5c6cb;
+      background: #fff5e5;
+      border: 1px solid #ffeeba;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    ul li {
+      margin-bottom: 8px;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h1>AI โปรแกรมออกกำลังกายอัจฉริยะ</h1>
-    
-    <label for="name">ชื่อของคุณ:</label>
-    <input type="text" id="name">
+    <h1>AI โปรแกรมออกกำลังกาย</h1>
+    <form id="exerciseForm">
+      <label for="weight">น้ำหนัก (กิโลกรัม):</label>
+      <input type="number" id="weight" required>
 
-    <label for="weight">น้ำหนัก (กิโลกรัม):</label>
-    <input type="number" id="weight" required>
+      <label for="height">ส่วนสูง (เซนติเมตร):</label>
+      <input type="number" id="height" required>
 
-    <label for="height">ส่วนสูง (เซนติเมตร):</label>
-    <input type="number" id="height" required>
-
-    <button onclick="calculateWorkout()">คำนวณ</button>
+      <button type="button" onclick="calculate()">คำนวณ</button>
+    </form>
 
     <div id="result" class="result" style="display: none;"></div>
     <div id="exercise" class="exercise" style="display: none;"></div>
   </div>
 
   <script>
-    function calculateWorkout() {
-      const name = document.getElementById("name").value;
+    function calculate() {
       const weight = parseFloat(document.getElementById("weight").value);
-      const height = parseFloat(document.getElementById("height").value);
+      const height = parseFloat(document.getElementById("height").value) / 100; // แปลงเป็นเมตร
 
-      if (!name || isNaN(weight) || isNaN(height)) {
+      if (isNaN(weight) || isNaN(height)) {
         alert("กรุณากรอกข้อมูลให้ครบถ้วน");
         return;
       }
 
       // คำนวณ BMI
-      const heightInMeters = height / 100;
-      const bmi = weight / (heightInMeters * heightInMeters);
-      let category;
-      
-      if (bmi < 18.5) {
-        category = "น้ำหนักน้อย";
-      } else if (bmi < 24.9) {
-        category = "ปกติ";
-      } else if (bmi < 29.9) {
-        category = "น้ำหนักเกิน";
-      } else {
-        category = "อ้วน";
-      }
+      const bmi = weight / (height * height);
 
-      // เก็บข้อมูลผู้ใช้ลง Local Storage
-      const userData = { name, weight, height, bmi: bmi.toFixed(2), category };
-      localStorage.setItem("userData", JSON.stringify(userData));
+      // คำนวณแผนการออกกำลังกายตามน้ำหนักและส่วนสูง
+      let sets = Math.max(3, Math.floor(weight / 10)); // เพิ่มเซ็ตตามน้ำหนัก
+      let reps = Math.max(10, Math.floor(height * 0.3)); // จำนวนครั้งตามส่วนสูง
+      let exerciseList = getExercisePlan(weight, height, sets, reps);
 
-      // แสดงผลลัพธ์
-      document.getElementById("result").style.display = "block";
-      document.getElementById("result").innerHTML = `
-        <p><strong>ชื่อ:</strong> ${name}</p>
-        <p><strong>BMI:</strong> ${bmi.toFixed(2)} (${category})</p>
+      // แสดงค่า BMI
+      const resultDiv = document.getElementById("result");
+      resultDiv.style.display = "block";
+      resultDiv.innerHTML = `
+        <p>ค่า BMI ของคุณ: ${bmi.toFixed(2)}</p>
+        <p>สถานะน้ำหนัก: ${getBMIStatus(bmi)}</p>
       `;
 
-      // คำนวณแผนการออกกำลังกายเฉพาะบุคคล
-      generateWorkoutPlan(weight, height, bmi, category);
+      // แสดงแผนออกกำลังกาย
+      const exerciseDiv = document.getElementById("exercise");
+      exerciseDiv.style.display = "block";
+      exerciseDiv.innerHTML = `
+        <h3>แผนออกกำลังกายสำหรับคุณ:</h3>
+        ${exerciseList}
+      `;
     }
 
-    function generateWorkoutPlan(weight, height, bmi, category) {
-      let exercises = "";
-      let sets = 3;
-      let reps = 10;
-      let duration = 30; // นาที
+    function getBMIStatus(bmi) {
+      if (bmi < 18.5) return "น้ำหนักน้อย";
+      if (bmi >= 18.5 && bmi < 24.9) return "ปกติ";
+      if (bmi >= 25 && bmi < 29.9) return "น้ำหนักเกิน";
+      return "อ้วน";
+    }
 
-      if (category === "น้ำหนักน้อย") {
-        exercises = `
-          <h3>แนะนำออกกำลังกายเพิ่มกล้ามเนื้อ:</h3>
-          <ul>
-            <li>Squats - ${sets} เซ็ต x ${reps} ครั้ง</li>
-            <li>Push-ups - ${sets} เซ็ต x ${reps} ครั้ง</li>
-            <li>Deadlifts - ${sets} เซ็ต x ${reps} ครั้ง</li>
-          </ul>
-          <p>คาร์ดิโอ: ${duration} นาที (เดินเร็ว/วิ่งเบาๆ)</p>
-        `;
-      } else if (category === "ปกติ") {
-        exercises = `
-          <h3>แนะนำออกกำลังกายทั่วไป:</h3>
-          <ul>
-            <li>Jumping Jacks - ${sets} เซ็ต x ${reps} ครั้ง</li>
-            <li>Planks - ${sets} เซ็ต x 30 วินาที</li>
-            <li>Burpees - ${sets} เซ็ต x ${reps} ครั้ง</li>
-          </ul>
-          <p>คาร์ดิโอ: ${duration} นาที (วิ่ง/ปั่นจักรยาน)</p>
-        `;
-      } else if (category === "น้ำหนักเกิน") {
-        exercises = `
-          <h3>แนะนำออกกำลังกายเพื่อลดไขมัน:</h3>
-          <ul>
-            <li>Mountain Climbers - ${sets} เซ็ต x ${reps} ครั้ง</li>
-            <li>Jump Rope - ${sets} เซ็ต x ${reps} ครั้ง</li>
-            <li>Bodyweight Squats - ${sets} เซ็ต x ${reps} ครั้ง</li>
-          </ul>
-          <p>คาร์ดิโอ: ${duration} นาที (เดินเร็ว/HIIT)</p>
-        `;
+    function getExercisePlan(weight, height, sets, reps) {
+      let exercises = [];
+      
+      if (weight < 50) {
+        exercises = [
+          "วิดพื้น",
+          "Squats",
+          "Plank",
+          "โยคะ"
+        ];
+      } else if (weight < 70) {
+        exercises = [
+          "กระโดดตบ",
+          "Lunges",
+          "Burpees",
+          "ดันพื้น"
+        ];
+      } else if (weight < 90) {
+        exercises = [
+          "วิ่งบนลู่",
+          "Deadlifts",
+          "Bench Press",
+          "ท่า Mountain Climbers"
+        ];
       } else {
-        exercises = `
-          <h3>แนะนำออกกำลังกายเผาผลาญไขมัน:</h3>
-          <ul>
-            <li>High Knees - ${sets} เซ็ต x ${reps} ครั้ง</li>
-            <li>Burpees - ${sets} เซ็ต x ${reps} ครั้ง</li>
-            <li>Jump Squats - ${sets} เซ็ต x ${reps} ครั้ง</li>
-          </ul>
-          <p>คาร์ดิโอ: ${duration + 10} นาที (HIIT/ว่ายน้ำ)</p>
-        `;
+        exercises = [
+          "เดินเร็ว",
+          "เวทเทรนนิ่ง",
+          "จักรยานอากาศ",
+          "โยคะเพื่อผ่อนคลาย"
+        ];
       }
 
-      document.getElementById("exercise").style.display = "block";
-      document.getElementById("exercise").innerHTML = exercises;
+      return `
+        <ul>
+          ${exercises.map(ex => `<li>${ex} - ${sets} เซ็ต (${reps} ครั้ง)</li>`).join("")}
+        </ul>
+      `;
     }
   </script>
 
