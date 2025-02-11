@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI คำนวณออกกำลังกาย</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -31,19 +30,30 @@
             color: white;
             font-weight: bold;
             border: none;
+            cursor: pointer;
         }
         button:hover {
             background: #e64a19;
         }
-        .result, .exercise, .weights, .nutrition, .graph {
+        .result, .exercise, .weights, .nutrition, .history {
             text-align: left;
             padding: 10px;
             margin-top: 20px;
         }
-        canvas {
+        table {
+            width: 100%;
+            border-collapse: collapse;
             background: white;
-            border-radius: 10px;
-            padding: 10px;
+            color: black;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background: #ff5722;
+            color: white;
         }
     </style>
 </head>
@@ -69,17 +79,13 @@
         </select>
         
         <button type="button" onclick="calculate()">คำนวณ</button>
-        <button type="button" onclick="showGraph()">แสดงกราฟน้ำหนักและส่วนสูง</button>
+        <button type="button" onclick="showHistory()">แสดงประวัติน้ำหนักและส่วนสูง</button>
     </form>
 
     <div id="result" class="result"></div>
-    <div id="exercise" class="exercise"></div>
     <div id="weights" class="weights"></div>
     <div id="nutrition" class="nutrition"></div>
-    
-    <div class="graph">
-        <canvas id="weightHeightChart"></canvas>
-    </div>
+    <div id="history" class="history"></div>
 </div>
 
 <script>
@@ -96,6 +102,7 @@ function calculate() {
         return;
     }
 
+    // บันทึกข้อมูลลง localStorage
     historyData.push({ weight, height, date: new Date().toLocaleDateString() });
     localStorage.setItem("historyData", JSON.stringify(historyData));
 
@@ -136,24 +143,34 @@ function calculate() {
     `;
 }
 
-function showGraph() {
-    const ctx = document.getElementById("weightHeightChart").getContext("2d");
+function showHistory() {
+    if (historyData.length === 0) {
+        document.getElementById("history").innerHTML = "<p>ยังไม่มีข้อมูลที่บันทึก</p>";
+        return;
+    }
 
-    const labels = historyData.map(data => data.date);
-    const weightData = historyData.map(data => data.weight);
-    const heightData = historyData.map(data => data.height);
+    let table = `
+        <h3>ประวัติน้ำหนักและส่วนสูง</h3>
+        <table>
+            <tr>
+                <th>วันที่</th>
+                <th>น้ำหนัก (กก.)</th>
+                <th>ส่วนสูง (ซม.)</th>
+            </tr>
+    `;
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [
-                { label: 'น้ำหนัก (กก.)', data: weightData, borderColor: 'red', fill: false },
-                { label: 'ส่วนสูง (ซม.)', data: heightData, borderColor: 'blue', fill: false }
-            ]
-        },
-        options: { scales: { y: { beginAtZero: true } } }
+    historyData.forEach(entry => {
+        table += `
+            <tr>
+                <td>${entry.date}</td>
+                <td>${entry.weight}</td>
+                <td>${entry.height}</td>
+            </tr>
+        `;
     });
+
+    table += "</table>";
+    document.getElementById("history").innerHTML = table;
 }
 </script>
 
