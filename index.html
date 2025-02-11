@@ -35,7 +35,7 @@
         button:hover {
             background: #e64a19;
         }
-        .result, .exercise, .weights, .graph {
+        .result, .exercise, .weights, .nutrition, .graph {
             text-align: left;
             padding: 10px;
             margin-top: 20px;
@@ -75,6 +75,7 @@
     <div id="result" class="result"></div>
     <div id="exercise" class="exercise"></div>
     <div id="weights" class="weights"></div>
+    <div id="nutrition" class="nutrition"></div>
     
     <div class="graph">
         <canvas id="weightHeightChart"></canvas>
@@ -82,6 +83,8 @@
 </div>
 
 <script>
+let historyData = JSON.parse(localStorage.getItem("historyData")) || [];
+
 function calculate() {
     const weight = parseFloat(document.getElementById("weight").value);
     const height = parseFloat(document.getElementById("height").value);
@@ -93,18 +96,15 @@ function calculate() {
         return;
     }
 
-    // คำนวณ BMI
-    const bmi = weight / ((height / 100) ** 2);
+    historyData.push({ weight, height, date: new Date().toLocaleDateString() });
+    localStorage.setItem("historyData", JSON.stringify(historyData));
 
-    // คำนวณ BMR
+    const bmi = weight / ((height / 100) ** 2);
     const bmr = 10 * weight + 6.25 * height - 5 * age + 5;
     let tdee = bmr * 1.2;
-
-    if (goal === "lose") {
-        tdee -= 500;
-    } else if (goal === "gain") {
-        tdee += 500;
-    }
+    
+    if (goal === "lose") tdee -= 500;
+    else if (goal === "gain") tdee += 500;
 
     document.getElementById("result").innerHTML = `
         <h3>ผลลัพธ์:</h3>
@@ -113,60 +113,46 @@ function calculate() {
         <p><strong>แคลอรี่ที่แนะนำต่อวัน (TDEE):</strong> ${tdee.toFixed(2)} แคลอรี่</p>
     `;
 
-    // คำนวณน้ำหนักเวทเทรนนิ่ง
     const deadliftWeight = (weight * 1.5).toFixed(1);
     const squatWeight = (weight * 1.2).toFixed(1);
     const benchPressWeight = (weight * 0.8).toFixed(1);
     const shoulderPressWeight = (weight * 0.5).toFixed(1);
 
-    let weightPlan = `<h3>น้ำหนักที่แนะนำสำหรับเวทเทรนนิ่ง</h3>
+    document.getElementById("weights").innerHTML = `
+        <h3>น้ำหนักที่แนะนำสำหรับเวทเทรนนิ่ง</h3>
         <ul>
             <li>Deadlift: ${deadliftWeight} กก.</li>
             <li>Squat: ${squatWeight} กก.</li>
             <li>Bench Press: ${benchPressWeight} กก.</li>
             <li>Shoulder Press: ${shoulderPressWeight} กก.</li>
-        </ul>`;
-    document.getElementById("weights").innerHTML = weightPlan;
-
-    // แผนการออกกำลังกาย
-    let exercisePlan = "<h3>แผนการออกกำลังกาย</h3><ul>";
-    exercisePlan += `
-        <li>วิ่ง ${Math.round(weight / 2 + height / 100)} นาที (ความเร็ว 8-10 กม./ชม.)</li>
-        <li>ปั่นจักรยาน ${Math.round(weight / 3 + height / 110)} นาที</li>
-        <li>วิดพื้น ${Math.round(weight / 4 + height / 120)} ครั้ง</li>
-        <li>Squats ${Math.round(weight / 3 + height / 115)} ครั้ง</li>
-        <li>Plank ${Math.round(weight / 5 + height / 120) * 10} วินาที</li>
+        </ul>
     `;
-    exercisePlan += "</ul>";
-    document.getElementById("exercise").innerHTML = exercisePlan;
+
+    document.getElementById("nutrition").innerHTML = `
+        <h3>โภชนาการที่แนะนำ</h3>
+        <p>💪 โปรตีน: ${Math.round(weight * 1.8)} กรัม/วัน</p>
+        <p>🥗 คาร์โบไฮเดรต: ${Math.round(tdee * 0.5 / 4)} กรัม/วัน</p>
+        <p>🫀 ไขมันดี: ${Math.round(tdee * 0.2 / 9)} กรัม/วัน</p>
+    `;
 }
 
-// แสดงกราฟน้ำหนักและส่วนสูง
 function showGraph() {
-    const weight = parseFloat(document.getElementById("weight").value);
-    const height = parseFloat(document.getElementById("height").value);
-
-    if (isNaN(weight) || isNaN(height)) {
-        alert("กรุณากรอกข้อมูลให้ครบ");
-        return;
-    }
-
     const ctx = document.getElementById("weightHeightChart").getContext("2d");
+
+    const labels = historyData.map(data => data.date);
+    const weightData = historyData.map(data => data.weight);
+    const heightData = historyData.map(data => data.height);
+
     new Chart(ctx, {
-        type: 'bar',
+        type: 'line',
         data: {
-            labels: ['น้ำหนัก (กก.)', 'ส่วนสูง (ซม.)'],
-            datasets: [{
-                label: 'ค่าปัจจุบัน',
-                data: [weight, height],
-                backgroundColor: ['#ff5722', '#2196f3']
-            }]
+            labels,
+            datasets: [
+                { label: 'น้ำหนัก (กก.)', data: weightData, borderColor: 'red', fill: false },
+                { label: 'ส่วนสูง (ซม.)', data: heightData, borderColor: 'blue', fill: false }
+            ]
         },
-        options: {
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
+        options: { scales: { y: { beginAtZero: true } } }
     });
 }
 </script>
