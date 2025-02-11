@@ -1,74 +1,189 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>คำนวณการออกกำลังกายตามน้ำหนัก</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; background: #f0f0f0; padding: 20px; }
-        .container { width: 50%; margin: auto; padding: 20px; background: white; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
-        input { padding: 8px; margin: 5px; width: 80px; }
-        button { padding: 10px; background: blue; color: white; border: none; cursor: pointer; margin-top: 10px; }
-        .result, .exercise { margin-top: 20px; padding: 15px; border-radius: 5px; background: #e3f2fd; }
-        ul { text-align: left; display: inline-block; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI โปรแกรมออกกำลังกายอัจฉริยะ</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: url('https://source.unsplash.com/1600x900/?fitness,gym') no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      width: 90%;
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #007bff;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .result, .exercise {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: left;
+    }
+    .result {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+    }
+    .exercise {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>คำนวณแผนออกกำลังกาย</h2>
-    <label>น้ำหนัก (kg): <input type="number" id="weight"></label><br>
-    <label>ส่วนสูง (cm): <input type="number" id="height"></label><br>
+  <div class="container">
+    <h1>AI โปรแกรมออกกำลังกายอัจฉริยะ</h1>
+    
+    <label for="name">ชื่อของคุณ:</label>
+    <input type="text" id="name">
+
+    <label for="weight">น้ำหนัก (กิโลกรัม):</label>
+    <input type="number" id="weight" required>
+
+    <label for="height">ส่วนสูง (เซนติเมตร):</label>
+    <input type="number" id="height" required>
+
     <button onclick="calculateWorkout()">คำนวณ</button>
 
-    <div id="bmiResult" class="result"></div>
-    <div id="exerciseSuggestion" class="exercise"></div>
-</div>
+    <div id="result" class="result" style="display: none;"></div>
+    <div id="exercise" class="exercise" style="display: none;"></div>
+  </div>
 
-<script>
-function calculateWorkout() {
-    let weight = parseFloat(document.getElementById("weight").value);
-    let height = parseFloat(document.getElementById("height").value) / 100;
-    
-    if (isNaN(weight) || isNaN(height)) {
-        alert("กรุณากรอกข้อมูลให้ครบ");
+  <script>
+    function calculateWorkout() {
+      const name = document.getElementById("name").value;
+      const weight = parseFloat(document.getElementById("weight").value);
+      const height = parseFloat(document.getElementById("height").value);
+
+      if (!name || isNaN(weight) || isNaN(height)) {
+        alert("กรุณากรอกข้อมูลให้ครบถ้วน");
         return;
+      }
+
+      // คำนวณ BMI
+      const heightInMeters = height / 100;
+      const bmi = weight / (heightInMeters * heightInMeters);
+      let category;
+      
+      if (bmi < 18.5) {
+        category = "น้ำหนักน้อย";
+      } else if (bmi < 24.9) {
+        category = "ปกติ";
+      } else if (bmi < 29.9) {
+        category = "น้ำหนักเกิน";
+      } else {
+        category = "อ้วน";
+      }
+
+      // เก็บข้อมูลผู้ใช้ลง Local Storage
+      const userData = { name, weight, height, bmi: bmi.toFixed(2), category };
+      localStorage.setItem("userData", JSON.stringify(userData));
+
+      // แสดงผลลัพธ์
+      document.getElementById("result").style.display = "block";
+      document.getElementById("result").innerHTML = `
+        <p><strong>ชื่อ:</strong> ${name}</p>
+        <p><strong>BMI:</strong> ${bmi.toFixed(2)} (${category})</p>
+      `;
+
+      // คำนวณแผนการออกกำลังกายเฉพาะบุคคล
+      generateWorkoutPlan(weight, height, bmi, category);
     }
 
-    let bmi = (weight / (height * height)).toFixed(2);
-    let resultText = `ค่า BMI ของคุณคือ: <strong>${bmi}</strong>`;
+    function generateWorkoutPlan(weight, height, bmi, category) {
+      let exercises = "";
+      let sets = 3;
+      let reps = 10;
+      let duration = 30; // นาที
 
-    let exercises = [];
-    let reps = 10;
-    let sets = 3;
+      if (category === "น้ำหนักน้อย") {
+        exercises = `
+          <h3>แนะนำออกกำลังกายเพิ่มกล้ามเนื้อ:</h3>
+          <ul>
+            <li>Squats - ${sets} เซ็ต x ${reps} ครั้ง</li>
+            <li>Push-ups - ${sets} เซ็ต x ${reps} ครั้ง</li>
+            <li>Deadlifts - ${sets} เซ็ต x ${reps} ครั้ง</li>
+          </ul>
+          <p>คาร์ดิโอ: ${duration} นาที (เดินเร็ว/วิ่งเบาๆ)</p>
+        `;
+      } else if (category === "ปกติ") {
+        exercises = `
+          <h3>แนะนำออกกำลังกายทั่วไป:</h3>
+          <ul>
+            <li>Jumping Jacks - ${sets} เซ็ต x ${reps} ครั้ง</li>
+            <li>Planks - ${sets} เซ็ต x 30 วินาที</li>
+            <li>Burpees - ${sets} เซ็ต x ${reps} ครั้ง</li>
+          </ul>
+          <p>คาร์ดิโอ: ${duration} นาที (วิ่ง/ปั่นจักรยาน)</p>
+        `;
+      } else if (category === "น้ำหนักเกิน") {
+        exercises = `
+          <h3>แนะนำออกกำลังกายเพื่อลดไขมัน:</h3>
+          <ul>
+            <li>Mountain Climbers - ${sets} เซ็ต x ${reps} ครั้ง</li>
+            <li>Jump Rope - ${sets} เซ็ต x ${reps} ครั้ง</li>
+            <li>Bodyweight Squats - ${sets} เซ็ต x ${reps} ครั้ง</li>
+          </ul>
+          <p>คาร์ดิโอ: ${duration} นาที (เดินเร็ว/HIIT)</p>
+        `;
+      } else {
+        exercises = `
+          <h3>แนะนำออกกำลังกายเผาผลาญไขมัน:</h3>
+          <ul>
+            <li>High Knees - ${sets} เซ็ต x ${reps} ครั้ง</li>
+            <li>Burpees - ${sets} เซ็ต x ${reps} ครั้ง</li>
+            <li>Jump Squats - ${sets} เซ็ต x ${reps} ครั้ง</li>
+          </ul>
+          <p>คาร์ดิโอ: ${duration + 10} นาที (HIIT/ว่ายน้ำ)</p>
+        `;
+      }
 
-    if (bmi < 18.5) {
-        resultText += "<p>คุณอยู่ในเกณฑ์น้ำหนักต่ำกว่าเกณฑ์</p>";
-        exercises = ["Squats", "Deadlifts", "Bench Press", "Pull-ups"];
-        reps = 15;
-        sets = 4;
-    } else if (bmi >= 18.5 && bmi < 25) {
-        resultText += "<p>คุณอยู่ในเกณฑ์ปกติ</p>";
-        exercises = ["Push-ups", "Jump Rope", "Plank", "Running"];
-        reps = 20;
-        sets = 3;
-    } else {
-        resultText += "<p>คุณอยู่ในเกณฑ์น้ำหนักเกิน</p>";
-        exercises = ["Brisk Walking", "Cycling", "Swimming", "HIIT Cardio"];
-        reps = 30;
-        sets = 2;
+      document.getElementById("exercise").style.display = "block";
+      document.getElementById("exercise").innerHTML = exercises;
     }
-
-    let exerciseText = "<h3>แนะนำท่าออกกำลังกาย:</h3><ul>";
-    exercises.forEach(exercise => {
-        exerciseText += `<li>${exercise} - ${sets} เซ็ต (${reps} ครั้ง/นาที)</li>`;
-    });
-    exerciseText += "</ul>";
-
-    document.getElementById("bmiResult").innerHTML = resultText;
-    document.getElementById("exerciseSuggestion").innerHTML = exerciseText;
-}
-</script>
+  </script>
 
 </body>
 </html>
