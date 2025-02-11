@@ -30,30 +30,14 @@
             color: white;
             font-weight: bold;
             border: none;
-            cursor: pointer;
         }
         button:hover {
             background: #e64a19;
         }
-        .result, .exercise, .weights, .nutrition, .history {
+        .result, .exercise, .nutrition {
             text-align: left;
             padding: 10px;
             margin-top: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            color: black;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background: #ff5722;
-            color: white;
         }
     </style>
 </head>
@@ -79,18 +63,14 @@
         </select>
         
         <button type="button" onclick="calculate()">คำนวณ</button>
-        <button type="button" onclick="showHistory()">แสดงประวัติน้ำหนักและส่วนสูง</button>
     </form>
 
     <div id="result" class="result"></div>
-    <div id="weights" class="weights"></div>
+    <div id="exercise" class="exercise"></div>
     <div id="nutrition" class="nutrition"></div>
-    <div id="history" class="history"></div>
 </div>
 
 <script>
-let historyData = JSON.parse(localStorage.getItem("historyData")) || [];
-
 function calculate() {
     const weight = parseFloat(document.getElementById("weight").value);
     const height = parseFloat(document.getElementById("height").value);
@@ -102,16 +82,18 @@ function calculate() {
         return;
     }
 
-    // บันทึกข้อมูลลง localStorage
-    historyData.push({ weight, height, date: new Date().toLocaleDateString() });
-    localStorage.setItem("historyData", JSON.stringify(historyData));
-
+    // คำนวณ BMI
     const bmi = weight / ((height / 100) ** 2);
+
+    // คำนวณค่าเผาผลาญพื้นฐาน (BMR)
     const bmr = 10 * weight + 6.25 * height - 5 * age + 5;
     let tdee = bmr * 1.2;
-    
-    if (goal === "lose") tdee -= 500;
-    else if (goal === "gain") tdee += 500;
+
+    if (goal === "lose") {
+        tdee -= 500;
+    } else if (goal === "gain") {
+        tdee += 500;
+    }
 
     document.getElementById("result").innerHTML = `
         <h3>ผลลัพธ์:</h3>
@@ -120,57 +102,47 @@ function calculate() {
         <p><strong>แคลอรี่ที่แนะนำต่อวัน (TDEE):</strong> ${tdee.toFixed(2)} แคลอรี่</p>
     `;
 
+    // แผนการออกกำลังกายละเอียดมาก (เพิ่มโหลดน้ำหนักให้แสดงต่อท้าย)
+    let exercisePlan = "<h3>แผนการออกกำลังกาย</h3><ul>";
+    
+    const runningMinutes = Math.round(weight / 2 + height / 100);
+    const pushups = Math.round(weight / 4 + height / 120);
+    const squats = Math.round(weight / 3 + height / 115);
+    const plankSeconds = Math.round(weight / 5 + height / 120) * 10;
+    
     const deadliftWeight = (weight * 1.5).toFixed(1);
     const squatWeight = (weight * 1.2).toFixed(1);
     const benchPressWeight = (weight * 0.8).toFixed(1);
     const shoulderPressWeight = (weight * 0.5).toFixed(1);
 
-    document.getElementById("weights").innerHTML = `
-        <h3>น้ำหนักที่แนะนำสำหรับเวทเทรนนิ่ง</h3>
-        <ul>
+    if (goal === "lose") {
+        exercisePlan += `
+            <li>วิ่ง ${runningMinutes} นาที</li>
+            <li>วิดพื้น ${pushups} ครั้ง</li>
+            <li>Squats ${squats} ครั้ง</li>
+            <li>Plank ${plankSeconds} วินาที</li>
+        `;
+    } else if (goal === "gain") {
+        exercisePlan += `
             <li>Deadlift: ${deadliftWeight} กก.</li>
             <li>Squat: ${squatWeight} กก.</li>
             <li>Bench Press: ${benchPressWeight} กก.</li>
             <li>Shoulder Press: ${shoulderPressWeight} กก.</li>
-        </ul>
-    `;
-
-    document.getElementById("nutrition").innerHTML = `
-        <h3>โภชนาการที่แนะนำ</h3>
-        <p>💪 โปรตีน: ${Math.round(weight * 1.8)} กรัม/วัน</p>
-        <p>🥗 คาร์โบไฮเดรต: ${Math.round(tdee * 0.5 / 4)} กรัม/วัน</p>
-        <p>🫀 ไขมันดี: ${Math.round(tdee * 0.2 / 9)} กรัม/วัน</p>
-    `;
-}
-
-function showHistory() {
-    if (historyData.length === 0) {
-        document.getElementById("history").innerHTML = "<p>ยังไม่มีข้อมูลที่บันทึก</p>";
-        return;
+        `;
     }
 
-    let table = `
-        <h3>ประวัติน้ำหนักและส่วนสูง</h3>
-        <table>
-            <tr>
-                <th>วันที่</th>
-                <th>น้ำหนัก (กก.)</th>
-                <th>ส่วนสูง (ซม.)</th>
-            </tr>
-    `;
+    exercisePlan += "</ul>";
+    document.getElementById("exercise").innerHTML = exercisePlan;
 
-    historyData.forEach(entry => {
-        table += `
-            <tr>
-                <td>${entry.date}</td>
-                <td>${entry.weight}</td>
-                <td>${entry.height}</td>
-            </tr>
-        `;
-    });
-
-    table += "</table>";
-    document.getElementById("history").innerHTML = table;
+    // โภชนาการแบบละเอียด
+    let nutritionPlan = "<h3>คำแนะนำด้านโภชนาการ</h3><ul>";
+    if (goal === "lose") {
+        nutritionPlan += "<li>ลดแป้ง เพิ่มโปรตีน</li><li>กินผักและผลไม้มากขึ้น</li>";
+    } else if (goal === "gain") {
+        nutritionPlan += "<li>เพิ่มโปรตีน เช่น เนื้อสัตว์ ไข่ขาว เวย์โปรตีน</li><li>กินคาร์บเชิงซ้อน</li>";
+    }
+    nutritionPlan += "</ul>";
+    document.getElementById("nutrition").innerHTML = nutritionPlan;
 }
 </script>
 
