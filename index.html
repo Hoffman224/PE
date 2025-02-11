@@ -1,159 +1,155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI โปรแกรมออกกำลังกาย & โภชนาการ</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, #6dd5ed, #2193b0);
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .container {
-      width: 100%;
-      max-width: 600px;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      text-align: center;
-      overflow-y: auto;
-      max-height: 90vh;
-    }
-    h1 {
-      color: #333;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      background: #2193b0;
-      color: white;
-      border: none;
-      margin-top: 15px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    button:hover {
-      background: #1b7892;
-    }
-    .result {
-      margin-top: 20px;
-      text-align: left;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI คำนวณออกกำลังกาย</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: url('https://source.unsplash.com/1600x900/?fitness,gym') no-repeat center center/cover;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            margin: auto;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        button {
+            background: #ff5722;
+            color: white;
+            font-weight: bold;
+            border: none;
+        }
+        button:hover {
+            background: #e64a19;
+        }
+        .result, .exercise, .nutrition {
+            text-align: left;
+            padding: 10px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>AI โปรแกรมออกกำลังกาย & โภชนาการ</h1>
-    
-    <label for="weight">น้ำหนัก (กก.):</label>
-    <input type="number" id="weight" placeholder="ระบุน้ำหนักของคุณ">
 
-    <label for="height">ส่วนสูง (ซม.):</label>
-    <input type="number" id="height" placeholder="ระบุส่วนสูงของคุณ">
-
-    <button onclick="calculateWorkout()">คำนวณแผนออกกำลังกาย</button>
-    <button onclick="saveData()">บันทึกข้อมูล</button>
-
-    <div id="output" class="result"></div>
-  </div>
-
-  <script>
-    function loadSavedData() {
-      const savedWeight = localStorage.getItem("weight");
-      const savedHeight = localStorage.getItem("height");
-
-      if (savedWeight && savedHeight) {
-        document.getElementById("weight").value = savedWeight;
-        document.getElementById("height").value = savedHeight;
-      }
-    }
-
-    function saveData() {
-      const weight = document.getElementById("weight").value;
-      const height = document.getElementById("height").value;
-
-      if (weight && height) {
-        localStorage.setItem("weight", weight);
-        localStorage.setItem("height", height);
-        alert("บันทึกข้อมูลเรียบร้อย!");
-      } else {
-        alert("กรุณากรอกข้อมูลให้ครบถ้วนก่อนบันทึก");
-      }
-    }
-
-    function calculateWorkout() {
-      const weight = parseFloat(document.getElementById("weight").value);
-      const height = parseFloat(document.getElementById("height").value);
-      const output = document.getElementById("output");
-
-      if (isNaN(weight) || isNaN(height) || weight <= 0 || height <= 0) {
-        output.innerHTML = "<p style='color:red;'>กรุณากรอกข้อมูลให้ถูกต้อง</p>";
-        return;
-      }
-
-      // คำนวณ BMI
-      const heightMeters = height / 100;
-      const bmi = (weight / (heightMeters * heightMeters)).toFixed(2);
-
-      // คำนวณแผนออกกำลังกาย
-      let cardioTime = Math.max(20, 60 - (weight / 2));
-      let cardioSpeed = Math.min(12, 6 + (weight / 20));
-      let squats = Math.min(50, 20 + (weight / 2));
-      let pushups = Math.min(40, 15 + (weight / 3));
-      let plankTime = Math.min(120, 30 + (weight / 2));
-
-      // คำนวณโภชนาการ
-      let calorieNeed = (weight * 30).toFixed(0);
-      let proteinIntake = (weight * 1.5).toFixed(1);
-      let carbIntake = (weight * 3).toFixed(1);
-      let fatIntake = (weight * 0.8).toFixed(1);
-      let fiberIntake = (weight * 0.3).toFixed(1);
-      let waterIntake = (weight * 0.03).toFixed(1);
-
-      output.innerHTML = `
-        <h3>ผลลัพธ์:</h3>
-        <p><strong>BMI:</strong> ${bmi}</p>
+<div class="container">
+    <h1>AI คำนวณออกกำลังกาย</h1>
+    <form id="exerciseForm">
+        <label>น้ำหนัก (กก.):</label>
+        <input type="number" id="weight" required>
         
-        <h3>แผนออกกำลังกาย</h3>
-        <ul>
-          <li><strong>🏃 วิ่งบนลู่:</strong> ${cardioTime.toFixed(0)} นาที ที่ความเร็ว ${cardioSpeed.toFixed(1)} km/h</li>
-          <li><strong>🦵 Squats:</strong> ${squats.toFixed(0)} ครั้ง</li>
-          <li><strong>💪 Push-ups:</strong> ${pushups.toFixed(0)} ครั้ง</li>
-          <li><strong>🧘 Plank:</strong> ${plankTime.toFixed(0)} วินาที</li>
-        </ul>
+        <label>ส่วนสูง (ซม.):</label>
+        <input type="number" id="height" required>
+        
+        <label>อายุ (ปี):</label>
+        <input type="number" id="age" required>
+        
+        <label>เป้าหมาย:</label>
+        <select id="goal">
+            <option value="lose">ลดน้ำหนัก</option>
+            <option value="maintain">รักษาน้ำหนัก</option>
+            <option value="gain">เพิ่มกล้ามเนื้อ</option>
+        </select>
+        
+        <button type="button" onclick="calculate()">คำนวณ</button>
+    </form>
 
-        <h3>โภชนาการที่แนะนำ</h3>
-        <ul>
-          <li><strong>🔥 พลังงานที่ต้องการ:</strong> ${calorieNeed} แคลอรี/วัน</li>
-          <li><strong>🥩 โปรตีน:</strong> ${proteinIntake} กรัม/วัน (เนื้อสัตว์, ไข่, ถั่ว, เวย์โปรตีน)</li>
-          <li><strong>🍚 คาร์โบไฮเดรต:</strong> ${carbIntake} กรัม/วัน (ข้าว, ขนมปัง, มันฝรั่ง, ผลไม้)</li>
-          <li><strong>🥑 ไขมัน:</strong> ${fatIntake} กรัม/วัน (อะโวคาโด, น้ำมันมะกอก, ถั่ว, ปลา)</li>
-          <li><strong>🌱 ไฟเบอร์:</strong> ${fiberIntake} กรัม/วัน (ผักใบเขียว, ธัญพืช, ผลไม้)</li>
-          <li><strong>💧 น้ำที่ควรดื่ม:</strong> ${waterIntake} ลิตร/วัน</li>
-        </ul>
-      `;
+    <div id="result" class="result"></div>
+    <div id="exercise" class="exercise"></div>
+    <div id="nutrition" class="nutrition"></div>
+</div>
+
+<script>
+function calculate() {
+    const weight = parseFloat(document.getElementById("weight").value);
+    const height = parseFloat(document.getElementById("height").value);
+    const age = parseInt(document.getElementById("age").value);
+    const goal = document.getElementById("goal").value;
+
+    if (isNaN(weight) || isNaN(height) || isNaN(age)) {
+        alert("กรุณากรอกข้อมูลให้ครบ");
+        return;
     }
 
-    loadSavedData();
-  </script>
+    // คำนวณ BMI
+    const bmi = weight / ((height / 100) ** 2);
+
+    // คำนวณค่าเผาผลาญพื้นฐาน (BMR)
+    const bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+    let tdee = bmr * 1.2; 
+
+    if (goal === "lose") {
+        tdee -= 500;
+    } else if (goal === "gain") {
+        tdee += 500;
+    }
+
+    document.getElementById("result").innerHTML = `
+        <h3>ผลลัพธ์:</h3>
+        <p><strong>BMI:</strong> ${bmi.toFixed(2)}</p>
+        <p><strong>BMR:</strong> ${bmr.toFixed(2)} แคลอรี่</p>
+        <p><strong>แคลอรี่ที่แนะนำต่อวัน (TDEE):</strong> ${tdee.toFixed(2)} แคลอรี่</p>
+    `;
+
+    // แผนการออกกำลังกายแบบละเอียดมาก (ตามน้ำหนักและส่วนสูงจริง)
+    let exercisePlan = "<h3>แผนการออกกำลังกาย</h3><ul>";
+    const runningMinutes = Math.round(weight / 2 + height / 100);
+    const cyclingMinutes = Math.round(weight / 3 + height / 110);
+    const pushups = Math.round(weight / 4 + height / 120);
+    const squats = Math.round(weight / 3 + height / 115);
+
+    if (goal === "lose") {
+        exercisePlan += `
+            <li>วิ่งบนลู่ ${runningMinutes} นาที ที่ความเร็ว 8-10 กม./ชม.</li>
+            <li>ปั่นจักรยาน ${cyclingMinutes} นาที</li>
+            <li>วิดพื้น ${pushups} ครั้ง</li>
+            <li>Squats ${squats} ครั้ง</li>
+        `;
+    } else if (goal === "maintain") {
+        exercisePlan += `
+            <li>เดินเร็ว ${runningMinutes} นาที</li>
+            <li>โยคะ ${cyclingMinutes} นาที</li>
+            <li>วิดพื้น ${pushups} ครั้ง</li>
+        `;
+    } else if (goal === "gain") {
+        exercisePlan += `
+            <li>Squats ${squats} ครั้ง</li>
+            <li>Deadlifts ${pushups} ครั้ง</li>
+            <li>Bench Press ${runningMinutes} ครั้ง</li>
+        `;
+    }
+
+    exercisePlan += "</ul>";
+    document.getElementById("exercise").innerHTML = exercisePlan;
+
+    // โภชนาการแบบละเอียด
+    let nutritionPlan = "<h3>คำแนะนำด้านโภชนาการ</h3><ul>";
+    if (goal === "lose") {
+        nutritionPlan += "<li>ลดแป้ง เพิ่มโปรตีน</li><li>กินผักและผลไม้มากขึ้น</li>";
+    } else if (goal === "maintain") {
+        nutritionPlan += "<li>รับประทานอาหารให้ครบ 5 หมู่</li><li>ดื่มน้ำให้เพียงพอ</li>";
+    } else if (goal === "gain") {
+        nutritionPlan += "<li>เพิ่มโปรตีน เช่น เนื้อสัตว์ ไข่ขาว เวย์โปรตีน</li><li>กินคาร์บเชิงซ้อน</li>";
+    }
+    nutritionPlan += "</ul>";
+    document.getElementById("nutrition").innerHTML = nutritionPlan;
+
+    // บันทึกข้อมูล
+    const userData = { weight, height, age, goal, bmi, bmr, tdee };
+    localStorage.setItem("userData", JSON.stringify(userData));
+}
+</script>
+
 </body>
 </html>
