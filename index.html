@@ -1,187 +1,148 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>โปรแกรมคำนวณการออกกำลังกาย AI</title>
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-image: url('background.jpg'); /* เพิ่มพื้นหลัง */
-      background-size: cover;
-      background-position: center;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .container {
-      width: 100%;
-      max-width: 500px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-      text-align: center;
-    }
-    h1 {
-      font-size: 1.8rem;
-      margin-bottom: 20px;
-      color: #333;
-    }
-    label {
-      font-size: 1rem;
-      font-weight: 500;
-      display: block;
-      margin-top: 10px;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-    button {
-      margin-top: 15px;
-      width: 100%;
-      padding: 12px;
-      background: #007bff;
-      border: none;
-      color: #fff;
-      font-size: 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    .result, .exercise {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 1rem;
-      text-align: left;
-    }
-    .result {
-      background: #eaf4e6;
-      border: 1px solid #c3e6cb;
-    }
-    .exercise {
-      background: #fff5e5;
-      border: 1px solid #ffeeba;
-    }
-    ul {
-      padding-left: 20px;
-    }
-    ul li {
-      margin-bottom: 8px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โปรแกรมคำนวณการออกกำลังกายและโภชนาการ</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(-180deg, rgba(74,121,161,1) 0%, rgba(20,36,54,1) 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #4e4e4e;
+        }
+        label {
+            font-size: 1rem;
+            margin: 10px 0 5px;
+            display: block;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: rgb(48,57,64);
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #5d7cfb, #9f68e0);
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: left;
+        }
+        .exercise {
+            background: #fff5e5;
+            border: 1px solid #ffeeba;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .nutrition {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        ul {
+            padding-left: 20px;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>โปรแกรมคำนวณและแนะนำการออกกำลังกาย</h1>
+        <form id="exerciseForm">
+            <label for="weight">น้ำหนัก (กิโลกรัม):</label>
+            <input type="number" id="weight" required>
 
-  <div class="container">
-    <h1>AI โปรแกรมออกกำลังกาย</h1>
-    <form id="exerciseForm">
-      <label for="weight">น้ำหนัก (กิโลกรัม):</label>
-      <input type="number" id="weight" required>
+            <label for="height">ส่วนสูง (เซนติเมตร):</label>
+            <input type="number" id="height" required>
 
-      <label for="height">ส่วนสูง (เซนติเมตร):</label>
-      <input type="number" id="height" required>
+            <button type="button" onclick="calculateExercise()">คำนวณ</button>
+        </form>
 
-      <button type="button" onclick="calculate()">คำนวณ</button>
-    </form>
+        <div id="bmiResult" class="result"></div>
+        <div id="exercisePlan" class="exercise"></div>
+        <div id="nutritionPlan" class="nutrition"></div>
+    </div>
 
-    <div id="result" class="result" style="display: none;"></div>
-    <div id="exercise" class="exercise" style="display: none;"></div>
-  </div>
+    <script>
+        function calculateExercise() {
+            const weight = parseFloat(document.getElementById("weight").value);
+            const height = parseFloat(document.getElementById("height").value) / 100; // แปลงเป็นเมตร
+            if (isNaN(weight) || isNaN(height)) {
+                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+                return;
+            }
 
-  <script>
-    function calculate() {
-      const weight = parseFloat(document.getElementById("weight").value);
-      const height = parseFloat(document.getElementById("height").value) / 100; // แปลงเป็นเมตร
+            const bmi = weight / (height * height);
 
-      if (isNaN(weight) || isNaN(height)) {
-        alert("กรุณากรอกข้อมูลให้ครบถ้วน");
-        return;
-      }
+            let exercisePlan = `<h3>แผนการออกกำลังกาย</h3><ul>`;
+            let nutritionPlan = `<h3>คำแนะนำด้านโภชนาการ</h3><ul>`;
 
-      // คำนวณ BMI
-      const bmi = weight / (height * height);
+            // กำหนดจำนวนเซ็ตและจำนวนครั้งของท่าฝึกตามน้ำหนักและส่วนสูง
+            let sets = Math.floor(weight / 10) + 2; // เพิ่มเซ็ตตามน้ำหนัก
+            let reps = Math.floor(height * 5); // เพิ่มจำนวนครั้งตามส่วนสูง
 
-      // คำนวณแผนการออกกำลังกายตามน้ำหนักและส่วนสูง
-      let sets = Math.max(3, Math.floor(weight / 10)); // เพิ่มเซ็ตตามน้ำหนัก
-      let reps = Math.max(10, Math.floor(height * 0.3)); // จำนวนครั้งตามส่วนสูง
-      let exerciseList = getExercisePlan(weight, height, sets, reps);
+            if (weight < 60) {
+                exercisePlan += `<li>กระโดดตบ ${sets} เซ็ต × ${reps} ครั้ง</li>`;
+                exercisePlan += `<li>วิดพื้น ${sets} เซ็ต × ${reps} ครั้ง</li>`;
+                nutritionPlan += `<li>เพิ่มโปรตีน เช่น ไข่ อกไก่</li>`;
+                nutritionPlan += `<li>กินแป้งเชิงซ้อน เช่น ข้าวกล้อง</li>`;
+            } else if (weight >= 60 && weight < 80) {
+                exercisePlan += `<li>สควอท ${sets} เซ็ต × ${reps} ครั้ง</li>`;
+                exercisePlan += `<li>วิ่งเร็ว 30 นาที</li>`;
+                nutritionPlan += `<li>กินอาหารสมดุล 5 หมู่</li>`;
+                nutritionPlan += `<li>ดื่มน้ำ 2-3 ลิตรต่อวัน</li>`;
+            } else {
+                exercisePlan += `<li>เดินเร็ว ${sets} นาที</li>`;
+                exercisePlan += `<li>เวทเทรนนิ่ง ${sets} เซ็ต</li>`;
+                nutritionPlan += `<li>ลดของทอด ของมัน</li>`;
+                nutritionPlan += `<li>กินผักและผลไม้สด</li>`;
+            }
 
-      // แสดงค่า BMI
-      const resultDiv = document.getElementById("result");
-      resultDiv.style.display = "block";
-      resultDiv.innerHTML = `
-        <p>ค่า BMI ของคุณ: ${bmi.toFixed(2)}</p>
-        <p>สถานะน้ำหนัก: ${getBMIStatus(bmi)}</p>
-      `;
+            exercisePlan += `</ul>`;
+            nutritionPlan += `</ul>`;
 
-      // แสดงแผนออกกำลังกาย
-      const exerciseDiv = document.getElementById("exercise");
-      exerciseDiv.style.display = "block";
-      exerciseDiv.innerHTML = `
-        <h3>แผนออกกำลังกายสำหรับคุณ:</h3>
-        ${exerciseList}
-      `;
-    }
-
-    function getBMIStatus(bmi) {
-      if (bmi < 18.5) return "น้ำหนักน้อย";
-      if (bmi >= 18.5 && bmi < 24.9) return "ปกติ";
-      if (bmi >= 25 && bmi < 29.9) return "น้ำหนักเกิน";
-      return "อ้วน";
-    }
-
-    function getExercisePlan(weight, height, sets, reps) {
-      let exercises = [];
-      
-      if (weight < 50) {
-        exercises = [
-          "วิดพื้น",
-          "Squats",
-          "Plank",
-          "โยคะ"
-        ];
-      } else if (weight < 70) {
-        exercises = [
-          "กระโดดตบ",
-          "Lunges",
-          "Burpees",
-          "ดันพื้น"
-        ];
-      } else if (weight < 90) {
-        exercises = [
-          "วิ่งบนลู่",
-          "Deadlifts",
-          "Bench Press",
-          "ท่า Mountain Climbers"
-        ];
-      } else {
-        exercises = [
-          "เดินเร็ว",
-          "เวทเทรนนิ่ง",
-          "จักรยานอากาศ",
-          "โยคะเพื่อผ่อนคลาย"
-        ];
-      }
-
-      return `
-        <ul>
-          ${exercises.map(ex => `<li>${ex} - ${sets} เซ็ต (${reps} ครั้ง)</li>`).join("")}
-        </ul>
-      `;
-    }
-  </script>
-
+            document.getElementById("bmiResult").innerHTML = `<h3>ค่า BMI ของคุณ: ${bmi.toFixed(2)}</h3>`;
+            document.getElementById("exercisePlan").innerHTML = exercisePlan;
+            document.getElementById("nutritionPlan").innerHTML = nutritionPlan;
+        }
+    </script>
 </body>
 </html>
